@@ -20,21 +20,32 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  *   As the arm servo approaches 0, the arm position moves up (away from the floor).
  *   As the claw servo approaches 0, the claw opens up (drops the game element).
  */
-public class TestHardwareK9bot
+public class Team9099HardwareK9bot
 {
     /* Public OpMode members. */
-    public DcMotor  leftMotor   = null;
-    public DcMotor  rightMotor  = null;
-    public DcMotor  autoPitcherLeftmotor = null;
-    public DcMotor  autoPitcherRightmotor = null;
-    public DcMotor  autoPitcherMoveLeftmotor = null;
-    public DcMotor  autoPitcherMoveRightmotor = null;
+    public DcMotor  leftMotor           = null;
+    public DcMotor  rightMotor          = null;
+
+    public DcMotor  leftPitcher         = null;
+    public DcMotor  rightPitcher        = null;
+
+    public DcMotor  ping                = null;
+
+    public DcMotor  leftArm             = null;
+    public DcMotor  rightArm            = null;
+
+    public Servo    leftHand            = null;
+    public Servo    rightHand           = null;
+
+    public Servo  beaconPressMotor    = null;
+
+
     /* Local OpMode members. */
     HardwareMap hwMap  = null;
     private ElapsedTime period  = new ElapsedTime();
 
     /* Constructor */
-    public TestHardwareK9bot() {
+    public Team9099HardwareK9bot() {
     }
 
     /* Initialize standard Hardware interfaces */
@@ -43,30 +54,54 @@ public class TestHardwareK9bot
         hwMap = ahwMap;
 
         // Define and Initialize Motors
-        leftMotor   = hwMap.dcMotor.get("left motor");
-        rightMotor  = hwMap.dcMotor.get("right motor");
+        leftMotor   = hwMap.dcMotor.get("left_drive");
         leftMotor.setDirection(DcMotor.Direction.REVERSE);
-        autoPitcherLeftmotor = hwMap.dcMotor.get("autoPitcher Left motor");
-        autoPitcherRightmotor = hwMap.dcMotor.get("autoPitcher Right motor");
-        autoPitcherLeftmotor.setDirection(DcMotor.Direction.REVERSE);
-        autoPitcherMoveLeftmotor   = hwMap.dcMotor.get("autoPitcher Move Left Motor");
-        autoPitcherMoveRightmotor  = hwMap.dcMotor.get("autoPitcher Move Right Motor");
-        autoPitcherMoveLeftmotor.setDirection(DcMotor.Direction.REVERSE);
-        // Set all motors to zero power
+        rightMotor  = hwMap.dcMotor.get("right_drive");
+
+        leftPitcher   = hwMap.dcMotor.get("left_Pitcher");
+        rightPitcher   = hwMap.dcMotor.get("right_Pitcher");
+
+        ping = hwMap.dcMotor.get("ping");
+
+        rightArm   = hwMap.dcMotor.get("right_Arm");
+        leftArm   = hwMap.dcMotor.get("left_Arm");
+
+        rightHand = hwMap.servo.get("right_Hand");
+        leftHand = hwMap.servo.get("left_Hand");
+
+        beaconPressMotor = hwMap.servo.get("beacon_press");
+
+
+
         leftMotor.setPower(0);
         rightMotor.setPower(0);
-        autoPitcherLeftmotor.setPower(0);
-        autoPitcherRightmotor.setPower(0);
-        autoPitcherMoveLeftmotor.setPower(0);
-        autoPitcherMoveRightmotor.setPower(0);
+
+        rightPitcher.setPower(0);
+        leftPitcher.setPower(0);
+
+        rightArm.setPower(0);
+        leftArm.setPower(0);
+
+        ping.setPower(0);
+
+        rightHand.setPosition(0);
+        leftHand.setPosition(0);
+
+        beaconPressMotor.setPosition(0);
+
+
         // Set all motors to run without encoders.
         // May want to use RUN_USING_ENCODERS if encoders are installed.
         leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        autoPitcherLeftmotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        autoPitcherRightmotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        autoPitcherMoveLeftmotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        autoPitcherMoveRightmotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        rightPitcher.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftPitcher.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        leftArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightArm.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        ping.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
     }
 
@@ -77,15 +112,19 @@ public class TestHardwareK9bot
      * The function looks at the elapsed cycle time, and sleeps for the remaining time interval.
      *
      * @param periodMs  Length of wait cycle in mSec.
-     * @throws InterruptedException
      */
-    public void waitForTick(long periodMs)  throws InterruptedException {
+    public void waitForTick(long periodMs) {
 
         long  remaining = periodMs - (long)period.milliseconds();
 
         // sleep for the remaining portion of the regular cycle period.
-        if (remaining > 0)
-            Thread.sleep(remaining);
+        if (remaining > 0) {
+            try {
+                Thread.sleep(remaining);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
 
         // Reset the cycle clock for the next pass.
         period.reset();
